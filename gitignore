@@ -1,0 +1,62 @@
+### Maven ###
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+.mvn/wrapper/maven-wrapper.lock
+
+### Java ###
+*.class
+*.log
+hs_err_pid*
+replay_pid*
+
+### Spring Boot ###
+/logs/
+spring.log
+
+### Environment / Secrets ###
+.env
+.env.*
+application-local.yml
+application-local.properties
+application-dev.yml
+application-dev.properties
+application-prod.yml
+application-prod.properties
+application-test.yml
+application-test.properties
+
+### IDEs ###
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code
+.vscode/
+.history/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Test reports ###
+/surefire-reports/
+/failsafe-reports/
+
+### Coverage ###
+/jacoco/
+jacoco.exec
+
+### Node (if React is in same repo) ###
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
