@@ -3,9 +3,9 @@ spring:
     name: Snap Pad
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASS}
+    url: jdbc:mysql://localhost:3306/snappad?useSSL=true&serverTimezone=UTC
+    username: root
+    password: admin123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -28,3 +28,7 @@ logging:
   level:
     org.springframework.security: INFO
     org.hibernate.SQL: WARN
+
+jwt:
+  secret: thisisaverylongjwtsecretkeywithmorethan32characters123456
+  expiration: 86400000
