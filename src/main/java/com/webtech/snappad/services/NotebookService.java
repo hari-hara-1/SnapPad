@@ -2,8 +2,9 @@ package com.webtech.snappad.services;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 
 import com.webtech.snappad.dtos.notebook.NotebookCreateRequestDto;
 import com.webtech.snappad.dtos.notebook.NotebookResponseDto;
@@ -80,6 +81,18 @@ public class NotebookService {
 
         notebookRepository.delete(notebook);
     }
+
+    @Transactional
+    public void autosave(Long userId, Long notebookId, String content) {
+
+        Notebook notebook = notebookRepository
+                .findByNotebookIdAndUser_Userid(notebookId, userId)
+                .orElseThrow(() -> new RuntimeException("Notebook not found"));
+
+        notebook.setContent(content);
+        notebook.setUpdatedAt(LocalDateTime.now());
+    }
+
 }
 
 
