@@ -1,13 +1,19 @@
 package com.webtech.snappad.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.webtech.snappad.security.JwtAuthenticationFilter;
 
@@ -23,24 +29,40 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // ❌ CSRF not needed for stateless APIs
+                // ✅ THIS IS THE FIX
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
                 .csrf(csrf -> csrf.disable())
 
-                // ❌ No sessions (JWT is stateless)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // ✅ Authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // PUBLIC endpoints
-                        .requestMatchers("/api/auth/**", "/api/users/register").permitAll()
 
-                        // Everything else requires JWT
-                        .anyRequest().authenticated()
-                )
+                // ✅ STATIC FRONTEND
+                .requestMatchers(
+                        "/",
+                        "/index.html",
+                        "/favicon.ico",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**"
+                ).permitAll()
 
-                // ✅ JWT filter runs BEFORE Spring's auth filter
+                // ✅ AUTH ENDPOINTS
+                .requestMatchers(
+                        "/api/auth/**",
+                        "/api/users/register"
+                ).permitAll()
+
+                // ✅ WEBSOCKET HANDSHAKE
+                .requestMatchers("/ws/**").permitAll()
+
+                // 🔒 EVERYTHING ELSE NEEDS JWT
+                .anyRequest().authenticated()
+        )
+
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
@@ -49,7 +71,30 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Needed if later you want AuthenticationManager
+    // 🔑 CORS CONFIG MUST LIVE HERE (NOT SEPARATE)
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5500"
+        ));
+
+        config.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
+
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config

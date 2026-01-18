@@ -2,7 +2,7 @@ package com.webtech.snappad.controllers;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import com.webtech.snappad.dtos.websocket.AutosaveRequestDto;
@@ -17,27 +17,23 @@ public class NotebookWebSocketController {
 
     private final NotebookService notebookService;
 
-    /**
-     * Client sends message to:
-     *   /app/notebook/autosave
-     */
     @MessageMapping("/notebook/autosave")
-    public void autosave(@Payload AutosaveRequestDto dto) {
+    public void autosave(
+            @Payload AutosaveRequestDto dto,
+            Authentication authentication   // ✅ THIS IS THE KEY
+    ) {
+        System.out.println("AUTOSAVE HIT");
 
-        // 🔐 User already authenticated by JWT during WebSocket handshake
-        User user = (User) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+        if (authentication == null) {
+            throw new RuntimeException("No authentication in WebSocket message");
+        }
 
-        Long userId = user.getUserid();
+        User user = (User) authentication.getPrincipal();
 
-        // 🔁 Reuse your EXISTING service method (unchanged)
         notebookService.autosave(
-                userId,
+                user.getUserid(),
                 dto.getNotebookId(),
                 dto.getContent()
         );
     }
 }
-

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SnapPad Autosave Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+
+<body>
+
+<h2>SnapPad Autosave Test</h2>
+
+<button onclick="login()">Login</button>
+<button onclick="connectWS()">Connect WebSocket</button>
+<button onclick="sendAutosave()">Send Autosave</button>
+
+<script>
+    let jwtToken = null;
+    let stompClient = null;
+
+    async function login() {
+        const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: "hari",
+                password: "1234"
+            })
+        });
+
+        const data = await res.json();
+        jwtToken = data.token;
+
+        console.log("JWT SET:", jwtToken);
+    }
+
+    function connectWS() {
+        if (!jwtToken) {
+            alert("Login first");
+            return;
+        }
+
+        const socket = new WebSocket("ws://localhost:8080/ws");
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect(
+            {
+                Authorization: "Bearer " + jwtToken
+            },
+            frame => {
+                console.log("STOMP CONNECTED", frame);
+            },
+            error => {
+                console.error("STOMP ERROR", error);
+            }
+        );
+    }
+
+    function sendAutosave() {
+        stompClient.send(
+            "/app/notebook/autosave",
+            {},
+            JSON.stringify({
+                notebookId: 1,
+                content: "Autosave from frontend"
+            })
+        );
+    }
+</script>
+
+</body>
+</html>

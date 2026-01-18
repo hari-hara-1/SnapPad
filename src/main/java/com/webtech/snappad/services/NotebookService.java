@@ -91,7 +91,10 @@ public class NotebookService {
 
         notebook.setContent(content);
         notebook.setUpdatedAt(LocalDateTime.now());
+
+        notebookRepository.save(notebook); // 🔴 THIS LINE
     }
+
 
 }
 
