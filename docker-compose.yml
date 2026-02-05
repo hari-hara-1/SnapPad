@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: snappad-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: snappad
+      MYSQL_USER: snappad_api
+      MYSQL_PASSWORD: Snap@Pad123
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: snappad-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      APP_NAME: Snap Pad
+      DB_URL: jdbc:mysql://mysql:3306/snappad?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: snappad_api
+      DB_PASSWORD: Snap@Pad123
+      JWT_SECRET: thisisaverylongjwtsecretkeywithmorethan32characters123456
+      JWT_EXPIRATION: 1200000
+      PORT: 8080
+
+volumes:
+  mysql_data:

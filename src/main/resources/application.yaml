@@ -1,11 +1,11 @@
 spring:
   application:
-    name: Snap Pad
+    name: ${APP_NAME:Snap Pad}
 
   datasource:
-    url: jdbc:mysql://localhost:3306/snappad?useSSL=true&serverTimezone=UTC
-    username: root
-    password: admin123
+    url: ${DB_URL:jdbc:mysql://localhost:3306/snappad?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:snappad_api}
+    password: ${DB_PASSWORD:Snap@Pad123}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -17,18 +17,15 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
 
-  jackson:
-    serialization:
-      indent_output: true
-
 server:
   port: ${PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET:thisisaverylongjwtsecretkeywithmorethan32characters123456}
+  expiration: ${JWT_EXPIRATION:1200000}
 
 logging:
   level:
     org.springframework.security: INFO
     org.hibernate.SQL: WARN
 
-jwt:
-  secret: thisisaverylongjwtsecretkeywithmorethan32characters123456
-  expiration: 1200000
