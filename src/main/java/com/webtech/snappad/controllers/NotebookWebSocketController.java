@@ -11,6 +11,8 @@ import com.webtech.snappad.services.NotebookService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.security.Principal;
+
 @Controller
 @RequiredArgsConstructor
 public class NotebookWebSocketController {
@@ -20,15 +22,13 @@ public class NotebookWebSocketController {
     @MessageMapping("/notebook/autosave")
     public void autosave(
             @Payload AutosaveRequestDto dto,
-            Authentication authentication   // ✅ THIS IS THE KEY
+            Principal principal
     ) {
-        System.out.println("AUTOSAVE HIT");
-
-        if (authentication == null) {
-            throw new RuntimeException("No authentication in WebSocket message");
+        if (principal == null) {
+            throw new RuntimeException("No Principal in WebSocket message");
         }
 
-        User user = (User) authentication.getPrincipal();
+        User user = (User) ((Authentication) principal).getPrincipal();
 
         notebookService.autosave(
                 user.getUserid(),
@@ -37,3 +37,4 @@ public class NotebookWebSocketController {
         );
     }
 }
+

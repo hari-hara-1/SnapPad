@@ -1,12 +1,10 @@
 package com.webtech.snappad.controllers;
 
+import com.webtech.snappad.dtos.user.UserCreateRequestDto;
 import com.webtech.snappad.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,10 +15,12 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(
-            @RequestParam String username,
-            @RequestParam String password
+            @RequestBody UserCreateRequestDto request
     ) {
-        userService.createUser(username, password);
+        userService.createUser(
+                request.getUsername(),
+                request.getPassword()
+        );
         return ResponseEntity.ok("User created");
     }
 }

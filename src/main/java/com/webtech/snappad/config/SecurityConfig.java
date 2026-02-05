@@ -29,76 +29,61 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // ✅ THIS IS THE FIX
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
                 .csrf(csrf -> csrf.disable())
-
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authorizeHttpRequests(auth -> auth
 
-                // ✅ STATIC FRONTEND
-                .requestMatchers(
-                        "/",
-                        "/index.html",
-                        "/favicon.ico",
-                        "/css/**",
-                        "/js/**",
-                        "/images/**"
-                ).permitAll()
+                        // ✅ VERY IMPORTANT: allow CORS preflight
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // ✅ AUTH ENDPOINTS
-                .requestMatchers(
-                        "/api/auth/**",
-                        "/api/users/register"
-                ).permitAll()
+                        // ✅ AUTH ENDPOINTS
+                        .requestMatchers("/api/auth/**", "/api/users/register").permitAll()
 
-                // ✅ WEBSOCKET HANDSHAKE
-                .requestMatchers("/ws/**").permitAll()
+                        // ✅ WEBSOCKET (if any)
+                        .requestMatchers("/ws/**").permitAll()
 
-                // 🔒 EVERYTHING ELSE NEEDS JWT
-                .anyRequest().authenticated()
-        )
-
+                        // 🔒 EVERYTHING ELSE NEEDS JWT
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
-                );
+                ).formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
+        ;
 
         return http.build();
     }
 
-    // 🔑 CORS CONFIG MUST LIVE HERE (NOT SEPARATE)
+    // ✅ CORS CONFIG FOR REACT (VITE)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
-                "http://localhost:5500"
+                "http://localhost:5173",
+                "http://127.16.61.228:5173"
         ));
-
         config.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
-
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
-
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config
-    ) throws Exception {
+            AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }

@@ -34,8 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
         String authHeader = request.getHeader("Authorization");
-        System.out.println("JWT FILTER HIT");
-        System.out.println("Auth header = " + authHeader);
+        System.out.println("JWT FILTER HIT → " + request.getRequestURI());
+
         // No header or not Bearer → skip
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -76,12 +76,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
 
-        String path = request.getRequestURI();
+        String uri = request.getRequestURI();
 
-        return request.getMethod().equals("OPTIONS")
-                || path.startsWith("/api/auth/")
-                || path.startsWith("/api/users/register")
-                || path.startsWith("/ws");
+        // Skip CORS preflight
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
+        // Skip public endpoints
+        return uri.equals("/api/users/register")
+                || uri.startsWith("/api/auth/");
     }
-
 }
