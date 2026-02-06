@@ -30,7 +30,6 @@ public class JwtStompChannelInterceptor implements ChannelInterceptor {
         System.out.println("STOMP COMMAND = " + accessor.getCommand());
         System.out.println("STOMP HEADERS = " + accessor.toNativeHeaderMap());
 
-        // 🔐 Authenticate ONLY on CONNECT
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
 
             List<String> authHeaders =
@@ -56,7 +55,6 @@ public class JwtStompChannelInterceptor implements ChannelInterceptor {
                             List.of() // no roles for now
                     );
 
-            // 🔥 THIS IS THE KEY PART
             SecurityContextHolder.getContext()
                     .setAuthentication(authentication);
 

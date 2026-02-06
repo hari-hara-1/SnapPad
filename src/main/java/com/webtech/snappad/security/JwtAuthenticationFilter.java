@@ -36,7 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         System.out.println("JWT FILTER HIT → " + request.getRequestURI());
 
-        // No header or not Bearer → skip
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -47,7 +46,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             Long userId = jwtUtil.extractUserId(token);
 
-            // Prevent overriding existing authentication
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 User user = userService.getById(userId);
@@ -68,7 +66,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
-            // Invalid token → ignore, request remains unauthenticated
         }
 
         filterChain.doFilter(request, response);
@@ -78,12 +75,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
 
-        // Skip CORS preflight
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
 
-        // Skip public endpoints
         return uri.equals("/api/users/register")
                 || uri.startsWith("/api/auth/");
     }

@@ -20,7 +20,6 @@ public class NotebookService {
 
     private final NotebookRepository notebookRepository;
 
-    // ✅ CREATE NOTEBOOK
     public NotebookResponseDto createNotebook(
             NotebookCreateRequestDto dto,
             User user
@@ -36,7 +35,6 @@ public class NotebookService {
         return toResponseDto(saved);
     }
 
-    // ✅ GET ALL NOTEBOOKS FOR USER
     public List<NotebookSummaryDto> getUserNotebooks(Long userId) {
         return notebookRepository.findByUser_Userid(userId)
                 .stream()
@@ -44,7 +42,6 @@ public class NotebookService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ GET SINGLE NOTEBOOK
     public NotebookResponseDto getNotebook(Long notebookId, Long userId) {
         Notebook notebook = notebookRepository
                 .findByNotebookIdAndUser_Userid(notebookId, userId)
@@ -54,7 +51,6 @@ public class NotebookService {
         return toResponseDto(notebook);
     }
 
-    // ✅ UPDATE NOTEBOOK
     public NotebookResponseDto updateNotebook(
             Long notebookId,
             NotebookUpdateRequestDto dto,
@@ -73,7 +69,6 @@ public class NotebookService {
         return toResponseDto(updated);
     }
 
-    // ✅ DELETE NOTEBOOK
     public void deleteNotebook(Long notebookId, Long userId) {
         Notebook notebook = notebookRepository
                 .findByNotebookIdAndUser_Userid(notebookId, userId)
@@ -83,9 +78,6 @@ public class NotebookService {
         notebookRepository.delete(notebook);
     }
 
-    // ===============================
-    // DTO MAPPERS (VERY IMPORTANT)
-    // ===============================
 
     private NotebookResponseDto toResponseDto(Notebook notebook) {
         NotebookResponseDto dto = new NotebookResponseDto();
@@ -105,7 +97,6 @@ public class NotebookService {
         return dto;
     }
 
-    // ✅ AUTOSAVE FROM WEBSOCKET
     public void autosave(Long notebookId, Long userId, String content) {
 
         Notebook notebook = notebookRepository

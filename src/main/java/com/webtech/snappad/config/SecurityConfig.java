@@ -36,16 +36,12 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
 
-                        // ✅ VERY IMPORTANT: allow CORS preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // ✅ AUTH ENDPOINTS
                         .requestMatchers("/api/auth/**", "/api/users/register").permitAll()
 
-                        // ✅ WEBSOCKET (if any)
                         .requestMatchers("/ws/**").permitAll()
 
-                        // 🔒 EVERYTHING ELSE NEEDS JWT
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
@@ -58,7 +54,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ CORS CONFIG FOR REACT (VITE)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
@@ -66,7 +61,7 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://127.16.61.228:5173"
+                "http://localhost:3000"
         ));
         config.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS"

@@ -18,8 +18,6 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Map<String, Object> attributes
     ) {
-        // 🔹 We allow the handshake
-        // 🔹 Authentication happens at STOMP CONNECT, not here
         return true;
     }
 
@@ -30,6 +28,5 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Exception exception
     ) {
-        // nothing to do
     }
 }
