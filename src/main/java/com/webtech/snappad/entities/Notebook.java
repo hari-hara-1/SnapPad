@@ -15,7 +15,6 @@ public class Notebook {
     private String title;
 
     @Lob
-    @Column(columnDefinition="LONGTEXT")
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
