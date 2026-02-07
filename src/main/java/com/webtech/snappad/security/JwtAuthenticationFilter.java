@@ -80,6 +80,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return uri.equals("/api/users/register")
-                || uri.startsWith("/api/auth/");
+                || uri.startsWith("/api/auth/") || uri.equals("/health");
     }
 }

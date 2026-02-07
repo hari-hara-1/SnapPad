@@ -42,6 +42,8 @@ public class SecurityConfig {
 
                         .requestMatchers("/ws/**").permitAll()
 
+                        .requestMatchers("/health").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
